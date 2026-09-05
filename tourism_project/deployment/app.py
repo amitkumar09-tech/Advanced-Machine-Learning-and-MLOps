@@ -1,21 +1,19 @@
 """
 Streamlit App
 --------------
-Loads the trained model committed to tourism_project/deployment/ and lets a
-user enter a customer's details to get a live purchase-likelihood prediction
-for the Wellness Tourism Package.
+Loads the trained model committed to tourism_project/deployment/ by the
+pipeline and lets a user enter a customer's details to get a live
+purchase-likelihood prediction for the Wellness Tourism Package.
+Streamlit Community Cloud runs this file directly from the repository.
 """
+
+import os
 
 import joblib
 import pandas as pd
 import streamlit as st
 
-import os
-
-MODEL_PATH = os.path.join(
-    os.path.dirname(__file__),
-    "best_model.joblib"
-)
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_model.joblib")
 
 
 @st.cache_resource
@@ -25,7 +23,7 @@ def load_model():
 
 model = load_model()
 
-st.title("Visit With Us — Wellness Tourism Package Predictor")
+st.title("Visit With Us \u2014 Wellness Tourism Package Predictor")
 st.write(
     "Enter a customer's details below to predict whether they are likely "
     "to purchase the newly introduced Wellness Tourism Package."
@@ -33,6 +31,7 @@ st.write(
 
 col1, col2 = st.columns(2)
 
+# Left column: contact / trip-related inputs.
 with col1:
     age = st.number_input("Age", min_value=18, max_value=100, value=35)
     type_of_contact = st.selectbox("Type of Contact", ["Self Enquiry", "Company Invited"])
@@ -44,6 +43,7 @@ with col1:
     number_of_followups = st.number_input("Number of Followups", min_value=0, max_value=10, value=3)
     product_pitched = st.selectbox("Product Pitched", ["Basic", "Deluxe", "Standard", "Super Deluxe", "King"])
 
+# Right column: customer profile / satisfaction inputs.
 with col2:
     preferred_property_star = st.selectbox("Preferred Property Star", [3.0, 4.0, 5.0])
     marital_status = st.selectbox("Marital Status", ["Single", "Married", "Divorced", "Unmarried"])
@@ -56,6 +56,8 @@ with col2:
     monthly_income = st.number_input("Monthly Income", min_value=0, value=20000, step=500)
 
 if st.button("Predict"):
+    # Assemble the inputs into a single-row dataframe matching the columns
+    # the training pipeline's preprocessor was fit on.
     input_df = pd.DataFrame([{
         "Age": age,
         "TypeofContact": type_of_contact,
