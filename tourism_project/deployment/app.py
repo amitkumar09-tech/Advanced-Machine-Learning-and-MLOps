@@ -10,7 +10,12 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-MODEL_PATH = "tourism_project/deployment/best_model.joblib"
+import os
+
+MODEL_PATH = os.path.join(
+    os.path.dirname(__file__),
+    "best_model.joblib"
+)
 
 
 @st.cache_resource
