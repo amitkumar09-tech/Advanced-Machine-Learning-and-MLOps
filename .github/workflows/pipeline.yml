@@ -77,4 +77,16 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add tourism_project/deployment/best_model.joblib
           git commit -m "Add trained model [skip ci]" || echo "No changes to commit"
-          git push
+          # main may have moved on since this job checked it out (e.g. a manual
+          # push from the notebook landed while training was running). Rebase
+          # this one commit onto the latest main before pushing instead of
+          # pushing blind, and retry a few times in case of a tight race.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              break
+            fi
+            echo "Push attempt $attempt failed, retrying..."
+            git rebase --abort || true
+            sleep 5
+          done
